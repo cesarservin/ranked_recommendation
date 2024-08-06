@@ -1,0 +1,107 @@
+site_name: rankmc # The name we have defined
+
+
+theme:
+  name: material
+  icon:
+    logo: material/dna
+  features:
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  language: en
+  
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      primary: custom
+      accent: indigo 
+    - scheme: slate 
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode    
+      primary: custom
+      accent: indigo
+
+
+plugins:
+  - glightbox
+  - offline    # To have offline functionality
+  - search    # To have search functionality on the document
+  - mkdocstrings:    # To generate documentation from the code docstrings
+      handlers:
+        python:
+          paths: [src]      # search packages in the src folder
+          options:
+            show_root_heading: true
+
+markdown_extensions:
+    # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: false
+
+    # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra_javascript:
+  - assets/javascripts/katex.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
+  - stylesheets/extra.css
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/cesarservin
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/cesarservin/
+  analytics:
+    provider: google
+    property: G-Z37MCTG3TH
+
+copyright: |
+  &copy; 2024 <a href="https://github.com/cesarservin"  target="_blank" rel="noopener">Cesar Servin</a>
+
+nav: # Setting up the navigation. Te below list will be tabs on left panel
+  - index.md
+  - data.md    # A markdown to list all the data related operations
+  - model.md  # A markdown file for documenting the model functions
+    # - About:
+    #   - 'Acknoledgments': about.md  # A markdown file for documenting the about section
+  - Data Science Portfolio: https://cesarservin.com/

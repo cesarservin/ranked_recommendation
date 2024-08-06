@@ -1,0 +1,200 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[project]
+
+classifiers = [
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy"
+]
+dependencies = [
+  "pandas",
+  "jupyter",
+  "pydantic",
+  "hatch",
+  "openpyxl",
+  "mkdocs-material",
+  "mkdocstrings-python",
+  "mkdocs-glightbox",
+  "pyinstaller",
+  "pyarrow",
+  "duckdb",
+  "scipy",
+  "matplotlib"
+]
+description = ''
+dynamic = ["version"]
+keywords = []
+license-files = {paths = ["LICENSE"]}
+name = "rankmc"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.bandit]
+exclude_dirs = ['wiki', 'docs', '.git', '.vscode', 'pyproject.toml']
+
+[tool.bandit.assert_used]
+skips = ['*_test.py', '*test_*.py']
+
+[tool.coverage.paths]
+rankmc = ["src"]
+tests = ["tests"]
+
+[tool.coverage.report]
+exclude_also = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "pragma: no cover",
+  "def __repr__",
+  "def __str__",
+  "def __init__"
+]
+
+[tool.coverage.run]
+branch = true
+omit = [
+  "*/__about__.py",
+  "*/__init__.py"
+]
+parallel = true
+source_pkgs = ["rankmc"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  ".pipelines",
+  ".azuredevops",
+  "dist",
+  "tests",
+  "notebooks",
+  ".idea",
+  "aml"
+]
+packages = ["src/rankmc"]
+
+[tool.hatch.build.targets.wheel]
+exclude = [
+  ".pipelines",
+  ".azuredevops",
+  "dist",
+  "tests",
+  "notebooks",
+  ".idea",
+  "aml"
+]
+packages = ["src/rankmc"]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.default]
+dependencies = [
+  "coverage[toml]>=7.4",
+  "pytest",
+  "bandit",
+  "pre-commit",
+  "ruff"
+]
+
+[tool.hatch.envs.default.scripts]
+cov-report = [
+  "- coverage combine",
+  "coverage report",
+  "coverage html"
+]
+test-cov = "coverage run -m pytest {args:tests}"
+tests = [
+  "test-cov",
+  "cov-report"
+]
+tests-no-cov = "pytest {args:tests}"
+
+[tool.hatch.envs.docs]
+dependencies = [
+  "mkdocs-material",
+  "mkdocstrings[python]>=0.24",
+  "Pygments",
+  "mkdocs-glightbox"
+]
+detached = true
+
+[tool.hatch.envs.docs.scripts]
+build = "mkdocs build"
+serve = "mkdocs serve"
+
+[tool.hatch.version]
+path = "src/rankmc/__about__.py"
+
+[tool.pytest.ini_options]
+addopts = "-s -v"
+log_cli = true
+log_cli_level = "INFO"
+pythonpath = [
+  "src"
+]
+testpaths = "tests"
+
+[tool.ruff]
+exclude = [".venv", ".hatch", ".git", ".pipelines", "tests", "wiki", ".idea"]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+ignore = [
+  # Ignore print statements
+  "T201",
+  # Allow non-abstract empty methods in abstract base classes
+  "B027",
+  # Allow boolean positional values in function calls, like `dict.get(... True)`
+  "FBT003",
+  # Boolean in function definitions
+  "FBT001",
+  "FBT002",
+  # Function call in arguemnt defaults, but required for FastAPI dependencies
+  # "B008",
+  # Unused function argument and redifiniton (will complain lots in pytests)
+  # "ARG001",
+  # Mixed case class names
+  "N815",
+  # For ruff formater
+  # 'Q000',
+  'W191',
+  'ISC001'
+]
+select = [
+  "A",
+  "ARG",
+  "B",
+  "C",
+  "DTZ",
+  "E",
+  "EM",
+  "F",
+  "FBT",
+  "I",
+  "ICN",
+  "ISC",
+  "N",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "Q",
+  "RUF",
+  "S",
+  "T",
+  "TID",
+  "UP",
+  "W",
+  "YTT"
+]
+unfixable = [
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.isort]
+known-first-party = ["rankmc"]
