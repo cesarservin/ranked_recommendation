@@ -1,11 +1,10 @@
-
 import numpy as np
 import pandas as pd
 import scipy as sp
 
 
-def prepare_df_for_sparse_matrix(df : pd.DataFrame, col_id : str, col_shift : str, df_index : pd.DataFrame) -> pd.DataFrame:  # noqa: E501
-    """Prepare the dataframe for the sparse matrix construction applying equal weights to all transitions 
+def prepare_df_for_sparse_matrix(df: pd.DataFrame, col_id: str, col_shift: str, df_index: pd.DataFrame) -> pd.DataFrame:
+    """Prepare the dataframe for the sparse matrix construction applying equal weights to all transitions
     within the same product combination
 
     Args:
@@ -27,33 +26,35 @@ def prepare_df_for_sparse_matrix(df : pd.DataFrame, col_id : str, col_shift : st
 
     # 2. Generate and add index to current products for matrix construction
 
-    df_shift = df_shift.merge(df_index[[col_shift,"index"]], on = col_shift, how= "left")
-    df_shift = df_shift.merge(df_index[[col_shift,"index"]], left_on="shifted_id", right_on = col_shift,
-                              how= "left", indicator=True)
+    df_shift = df_shift.merge(df_index[[col_shift, "index"]], on=col_shift, how="left")
+    df_shift = df_shift.merge(
+        df_index[[col_shift, "index"]], left_on="shifted_id", right_on=col_shift, how="left", indicator=True
+    )
 
     # 3. Remove last rows of each order
     # Since our last product added to the cart has no transition product to go to in the network. We will remove those
     # rows which are all the rows where they are left_only
-    df_shift = df_shift[df_shift["_merge"]!="left_only"]
+    df_shift = df_shift[df_shift["_merge"] != "left_only"]
 
     # 4. Generate edge weights or probabilities
 
-    #test with filter data
-    #df_shift = df_shift.loc[(df_shift['index_x']==33) | (df_shift['index_x']==0)]
+    # test with filter data
+    # df_shift = df_shift.loc[(df_shift['index_x']==33) | (df_shift['index_x']==0)]
 
     # generates the count of all with the same initial transition
-    outdegrees = df_shift[["index_x", "index_y"]].groupby("index_x", as_index = False).count()
+    outdegrees = df_shift[["index_x", "index_y"]].groupby("index_x", as_index=False).count()
 
     # renames columns and merges data into new dataframe
-    outdegrees.rename(columns = {"index_y" : "OUTDEGREE"}, inplace = True)
-    segments = df_shift.merge(outdegrees, on = "index_x", how = "left")
+    outdegrees.rename(columns={"index_y": "OUTDEGREE"}, inplace=True)
+    segments = df_shift.merge(outdegrees, on="index_x", how="left")
 
     # generates equal weights for all transitions withing the same product combination
     segments["WEIGHT"] = 1.0 / segments["OUTDEGREE"]
 
     return segments
 
-def create_sparse_matrix(df : pd.DataFrame, df_index : pd.DataFrame) -> tuple[sp.sparse.csr_matrix, np.ndarray]:
+
+def create_sparse_matrix(df: pd.DataFrame, df_index: pd.DataFrame) -> tuple[sp.sparse.csr_matrix, np.ndarray]:
     """Create a sparse matrix from the dataframe
 
     Args:
@@ -65,14 +66,15 @@ def create_sparse_matrix(df : pd.DataFrame, df_index : pd.DataFrame) -> tuple[sp
     """
     import scipy as sp
 
-    n = df_index.index.max()+1
+    n = df_index.index.max() + 1
 
     # Create a sparse matrix with n x n dimensions
     matrix = sp.sparse.csr_matrix((df["WEIGHT"], (df["index_x"], df["index_y"])), shape=(n, n))
 
     return matrix, n
 
-def init_state_mc(df : pd.DataFrame, n : int) -> np.ndarray:
+
+def init_state_mc(df: pd.DataFrame, n: int) -> np.ndarray:
     """generate the initial state for the markov chain based on the number of ids from the dataframe
 
     Args:
@@ -90,8 +92,8 @@ def init_state_mc(df : pd.DataFrame, n : int) -> np.ndarray:
     x0[actual_id_indices] = 1.0 / n
     return x0
 
-def eval_markov_chain(matrix : sp.sparse.csr_matrix, x0 : np.ndarray, t_max : int) -> tuple[np.ndarray, np.ndarray]:
 
+def eval_markov_chain(matrix: sp.sparse.csr_matrix, x0: np.ndarray, t_max: int) -> tuple[np.ndarray, np.ndarray]:
     tv_distances = np.zeros(t_max)
 
     x = x0.copy()
@@ -101,7 +103,8 @@ def eval_markov_chain(matrix : sp.sparse.csr_matrix, x0 : np.ndarray, t_max : in
 
     return x, tv_distances
 
-def create_mc_df(x : np.ndarray, df_index : pd.DataFrame) -> pd.DataFrame:
+
+def create_mc_df(x: np.ndarray, df_index: pd.DataFrame) -> pd.DataFrame:
     """creates a dataframe with the probability of each product to generate a rank dataframe
 
     Args:
@@ -114,9 +117,9 @@ def create_mc_df(x : np.ndarray, df_index : pd.DataFrame) -> pd.DataFrame:
 
     # Sort the products by their probability to generate rank
     ranks = np.argsort(-x)
-    #generate dictionary to create dataframe
-    mc = {"index": ranks, "ss_prob": x[ranks], "rank": range(1, len(ranks)+1)}
+    # generate dictionary to create dataframe
+    mc = {"index": ranks, "ss_prob": x[ranks], "rank": range(1, len(ranks) + 1)}
     df_mc = pd.DataFrame(mc)
-    df_mc = df_mc.merge(df_index, on = "index", how ="left")
+    df_mc = df_mc.merge(df_index, on="index", how="left")
 
     return df_mc

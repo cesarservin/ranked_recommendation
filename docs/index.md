@@ -34,7 +34,7 @@ order_products
 ## Result ✅
 
  - **Findings:**
-   - Based on both rankings markov chains model and from the initial counts of sales they shown to be similar. 
+   - Based on both rankings markov chains model and from the initial counts of sales they shown to be similar.
    I was expecting the ranking of products to be different, however given that this is smaller dataset the results might change with the extended dataset.
 
 

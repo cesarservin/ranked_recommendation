@@ -133,7 +133,7 @@ def csv_dep_init(paths: list) -> pd.DataFrame:
 
 def datafile_path_finder(file_name: str) -> str:
     """
-    Constructs a path by combining the parent directory of the current working directory with the 'data' folder 
+    Constructs a path by combining the parent directory of the current working directory with the 'data' folder
     and the provided file name. If no file name is provided, a default path or an empty string can be returned.
 
     Args:
@@ -149,6 +149,7 @@ def datafile_path_finder(file_name: str) -> str:
     rawdata_dir = os.path.join(main_dir, "data", file_name)
     df_dir = glob.glob(rawdata_dir)[0]
     return df_dir
+
 
 def stratified_sample(df: pd.DataFrame, col: str, n_samples: int) -> pd.DataFrame:
     """Sample a DataFrame by a column, stratified by the column.
