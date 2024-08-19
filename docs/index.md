@@ -39,7 +39,7 @@ order_products
 
 
 - **Visualizations**:
-  - ![Results](\img\rankingscomp.jpg)
+  - ![Results](img/rankingscomp.jpg)
 
 
 ## Directory Structure
